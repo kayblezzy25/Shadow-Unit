@@ -57,6 +57,6 @@ The numbers live in Unity as `OperatorData` assets in `Assets/ShadowUnit/Resourc
 
 ## Notes for later steps
 
-- **Weapons (Step 7):** the Hornet-9 SMG and Longreach DMR are new `WeaponData` assets to create; the VK-7 Carbine already exists.
+- **Weapons:** all three starting guns exist as `WeaponData` assets; see [WEAPONS.md](WEAPONS.md).
 - **Armour (Step 5):** `Health` needs an armour value before the armour numbers do anything.
 - **Art (Step 9):** the sheets above are the reference for the image-to-3D and Mixamo pipeline. ZOX's back-mounted blade and Daed's quad-tube night vision are their silhouette features; keep them readable at game distance.

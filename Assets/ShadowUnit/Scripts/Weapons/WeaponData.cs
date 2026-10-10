@@ -2,7 +2,9 @@ using UnityEngine;
 
 namespace ShadowUnit
 {
-    public enum WeaponCategory { AssaultRifle, SMG, SniperRifle, Shotgun, LMG, Pistol }
+    public enum WeaponCategory { AssaultRifle, SMG, SniperRifle, Shotgun, LMG, Pistol, DMR }
+    /// <summary>Which placeholder viewmodel to build until imported models replace them.</summary>
+    public enum WeaponModelType { Carbine, SMG, DMR }
     public enum FireMode { Automatic, SemiAutomatic }
 
     /// <summary>All tunable weapon stats. Create new weapons via Assets > Create > Shadow Unit > Weapon Data.</summary>
@@ -13,6 +15,9 @@ namespace ShadowUnit
         public string weaponName = "VK-7 Carbine";
         public WeaponCategory category = WeaponCategory.AssaultRifle;
         public FireMode fireMode = FireMode.Automatic;
+        public WeaponModelType model = WeaponModelType.Carbine;
+        [Tooltip("Shop price in cash (Phase 3 progression).")]
+        public int price = 1500;
 
         [Header("Damage")]
         public float damage = 24f;
@@ -56,6 +61,11 @@ namespace ShadowUnit
         [Header("Audio")]
         public AudioClip fireSound;
         public AudioClip reloadSound;
+        [Tooltip("Quieter shots, and enemies only hear them within 18 m instead of 45 m.")]
+        public bool suppressed;
+
+        public const float HearingRange = 45f, SuppressedHearingRange = 18f;
+        public float HearingDistance => suppressed ? SuppressedHearingRange : HearingRange;
 
         public float SecondsPerShot => 60f / Mathf.Max(1f, fireRate);
 

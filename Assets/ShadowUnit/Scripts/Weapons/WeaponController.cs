@@ -48,10 +48,21 @@ namespace ShadowUnit
             {
                 viewRoot = new GameObject("ViewModel").transform;
                 viewRoot.SetParent(cam.transform, false);
-                model = WeaponModels.BuildRifle(viewRoot);
-                muzzle = model.Find("Muzzle");
             }
+            BuildModel();
             ResetWeapon();
+        }
+
+        WeaponModelType builtModel;
+
+        /// <summary>Builds (or rebuilds, when the weapon changes) the placeholder viewmodel for the current WeaponData.</summary>
+        void BuildModel()
+        {
+            if (model != null && builtModel == data.model) return;
+            if (model != null) Destroy(model.gameObject);
+            model = WeaponModels.Build(data.model, viewRoot);
+            muzzle = model.Find("Muzzle");
+            builtModel = data.model;
         }
 
         public void ResetWeapon()
@@ -136,9 +147,10 @@ namespace ShadowUnit
             float recoilMul = IsAiming ? data.adsRecoilMultiplier : 1f;
             player.AddRecoil(data.recoilVertical * recoilMul * UnityEngine.Random.Range(0.8f, 1.2f), UnityEngine.Random.Range(-data.recoilHorizontal, data.recoilHorizontal) * recoilMul);
             kick = 1f;
-            if (EffectsManager.I != null) EffectsManager.I.MuzzleFlash(muzzle.position, 0.8f);
-            AudioManager.I.Play2D(data.fireSound != null ? data.fireSound : AudioLibrary.RifleShot, 0.55f, UnityEngine.Random.Range(0.95f, 1.05f));
-            SoldierAI.ReportGunfire(owner, owner.transform.position);
+            if (EffectsManager.I != null) EffectsManager.I.MuzzleFlash(muzzle.position, data.suppressed ? 0.35f : 0.8f);
+            float volume = data.suppressed ? 0.28f : 0.55f, pitch = data.suppressed ? 1.35f : 1f;
+            AudioManager.I.Play2D(data.fireSound != null ? data.fireSound : AudioLibrary.RifleShot, volume, pitch * UnityEngine.Random.Range(0.95f, 1.05f));
+            SoldierAI.ReportGunfire(owner, owner.transform.position, data.HearingDistance);
         }
 
         public static Vector3 SpreadDirection(Vector3 forward, float spreadDegrees)

@@ -127,13 +127,13 @@ namespace ShadowUnit
         // ---------- events ----------
 
         /// <summary>Gunshots alert enemies within hearing range (they search the sound, they do not see through walls).</summary>
-        public static void ReportGunfire(Soldier shooter, Vector3 position)
+        public static void ReportGunfire(Soldier shooter, Vector3 position, float hearingRange = WeaponData.HearingRange)
         {
             foreach (SoldierAI ai in All)
             {
                 if (ai.me == null || !ai.me.Alive || ai.me.team == shooter.team) continue;
                 if (ai.state == State.Engage || ai.state == State.Cover) continue;
-                if ((ai.transform.position - position).sqrMagnitude > 45f * 45f) continue;
+                if ((ai.transform.position - position).sqrMagnitude > hearingRange * hearingRange) continue;
                 ai.lastKnownPos = position;
                 ai.state = State.Search;
                 ai.searchUntil = Time.time + 7f;

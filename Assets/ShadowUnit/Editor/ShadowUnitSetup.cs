@@ -83,9 +83,52 @@ namespace ShadowUnit.EditorTools
                 var w = ScriptableObject.CreateInstance<WeaponData>();
                 AssetDatabase.CreateAsset(w, weaponPath);
             }
+            CreateWeapons();
             CreateOperators();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        /// <summary>Creates the operators' starting guns if missing (the VK-7 Carbine is made above). Existing assets keep your tuning.</summary>
+        static void CreateWeapons()
+        {
+            Weapon("Hornet9_SMG", w =>
+            {
+                w.weaponName = "Hornet-9 SMG";
+                w.category = WeaponCategory.SMG;
+                w.model = WeaponModelType.SMG;
+                w.price = 1200;
+                w.damage = 18f; w.headshotMultiplier = 1.6f;
+                w.effectiveRange = 18f; w.minDamageFalloff = 0.5f; w.maxRange = 120f;
+                w.fireRate = 900f; w.magazineSize = 33; w.reserveAmmo = 165; w.reloadTime = 1.8f;
+                w.hipSpread = 1.8f; w.adsSpread = 0.6f; w.spreadPerShot = 0.25f; w.maxExtraSpread = 3f; w.spreadRecovery = 8f; w.moveSpreadMultiplier = 1.2f;
+                w.recoilVertical = 0.55f; w.recoilHorizontal = 0.4f; w.recoilRecovery = 9f; w.adsRecoilMultiplier = 0.7f;
+                w.hipFov = 70f; w.adsFov = 58f; w.adsTime = 0.13f;
+            });
+            Weapon("Longreach_DMR", w =>
+            {
+                w.weaponName = "Longreach DMR";
+                w.category = WeaponCategory.DMR;
+                w.fireMode = FireMode.SemiAutomatic;
+                w.model = WeaponModelType.DMR;
+                w.price = 2400;
+                w.suppressed = true;
+                w.damage = 46f; w.headshotMultiplier = 2f;
+                w.effectiveRange = 70f; w.minDamageFalloff = 0.75f; w.maxRange = 260f;
+                w.fireRate = 300f; w.magazineSize = 20; w.reserveAmmo = 80; w.reloadTime = 2.6f;
+                w.hipSpread = 3.5f; w.adsSpread = 0.08f; w.spreadPerShot = 0.6f; w.maxExtraSpread = 2.5f; w.spreadRecovery = 5f; w.moveSpreadMultiplier = 2f;
+                w.recoilVertical = 1.9f; w.recoilHorizontal = 0.3f; w.recoilRecovery = 6f; w.adsRecoilMultiplier = 0.6f;
+                w.hipFov = 70f; w.adsFov = 38f; w.adsTime = 0.26f;
+            });
+        }
+
+        static void Weapon(string file, System.Action<WeaponData> setup)
+        {
+            string path = Res + "/Weapons/" + file + ".asset";
+            if (AssetDatabase.LoadAssetAtPath<WeaponData>(path) != null) return;
+            var w = ScriptableObject.CreateInstance<WeaponData>();
+            setup(w);
+            AssetDatabase.CreateAsset(w, path);
         }
 
         /// <summary>Creates the three launch operators if missing. Existing assets are left alone so your tuning is kept.</summary>

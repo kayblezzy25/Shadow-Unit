@@ -118,7 +118,7 @@ Assets/ShadowUnit/
     UI/        UIManager, HUDController, UIFactory, SafeArea
   (created by the setup menu)
   Scenes/Frontline.unity
-  Resources/ShadowUnit/SU_Lit.mat, SU_Emissive.mat, SU_Unlit.mat, SU_Sky.mat, Weapons/VK7_Carbine.asset,
+  Resources/ShadowUnit/SU_Lit.mat, SU_Emissive.mat, SU_Unlit.mat, SU_Sky.mat, Weapons/VK7_Carbine.asset, Hornet9_SMG.asset, Longreach_DMR.asset,
                        Operators/ZOX.asset, Scott.asset, Daed.asset
 ```
 

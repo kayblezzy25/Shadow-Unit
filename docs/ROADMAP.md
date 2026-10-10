@@ -29,7 +29,7 @@ Shadow Unit is an original, offline tactical shooter inspired by the style of mo
 |---|---|---|---|---|
 | 1 · Design | 1 | 1–3: game pitch, operators, level plan | Plan on paper | To do |
 | 2 · Core gameplay | 2–4 | 4–6: project setup, movement and shooting, enemy AI | **Fun with grey boxes** | Mostly built |
-| 3 · Systems | 5–6 | 7–8: weapons, attachments, abilities, offline saving | Saves work offline | One gun built |
+| 3 · Systems | 5–6 | 7–8: weapons, attachments, abilities, offline saving | Saves work offline | 3 guns built |
 | 4 · Visuals and feel | 7–10 | 9–11: realistic art and lighting, effects and sound, destruction | Looks like a real place | Placeholder art |
 | 5 · UI, builds, polish | 11–12 | 12–15: menus and HUD, offline builds, phone speed, playtest | 60 fps in airplane mode | Menus/HUD built |
 | 6 · Launch and seasons | 13+ | 16: store launch, then a new season every 3 months or so | Live on a store | To do |
@@ -226,8 +226,9 @@ Goal: 5 guns driven by data, attachments, and the 3 operator abilities working.
 
 ```text
 For Shadow Unit, build the weapon and ability systems in Unity:
-1. Create WeaponData assets for 5 original guns: pistol, SMG, assault rifle,
-   shotgun, DMR. Give the numbers for each and add a price field.
+1. The Hornet-9 SMG, VK-7 Carbine and Longreach DMR WeaponData assets exist
+   (docs/WEAPONS.md). Add a pistol and a shotgun to make 5, with numbers that
+   fit alongside them.
 2. WeaponManager.cs: equips primary + secondary, swap with Q / a mobile SWAP
    button, keeps ammo per gun, and swaps the viewmodel.
 3. Attachments as AttachmentData ScriptableObjects that modify stats: red-dot,
@@ -464,7 +465,7 @@ Done when: the season ships and you have a template to reuse for the next one.
 - [ ] Step 4: Prototype runs with no Console errors; TestRange scene added
 - [ ] Step 5: Movement, aiming and shooting feel good *(base built; slide and armour to add)*
 - [ ] Step 6: Enemy AI patrols, attacks, searches and flanks *(engage/cover/search built; patrol, flanking, boss to add)*
-- [ ] Step 7: 5 guns, attachments and 3 abilities working *(1 gun built)*
+- [ ] Step 7: 5 guns, attachments and 3 abilities working *(3 guns built: Hornet-9, VK-7, Longreach; see docs/WEAPONS.md)*
 - [ ] Step 8: Progress saves and loads offline
 - [ ] Step 9: Realistic art and lighting in place
 - [ ] Step 10: Effects and sound feel punchy *(placeholders built)*
