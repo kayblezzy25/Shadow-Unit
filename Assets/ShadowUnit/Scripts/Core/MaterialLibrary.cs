@@ -11,9 +11,18 @@ namespace ShadowUnit
     /// </summary>
     public static class MaterialLibrary
     {
-        static Material litBase, unlitBase;
+        static Material litBase, unlitBase, emissiveBase;
         static readonly Dictionary<string, Material> Cache = new Dictionary<string, Material>();
         static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+
+        // statics survive between Editor play sessions when domain reload is off; drop objects from the previous session
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            litBase = unlitBase = emissiveBase = null;
+            Cache.Clear();
+            Textures.Clear();
+        }
 
         static Material LitBase
         {
@@ -44,13 +53,33 @@ namespace ShadowUnit
             }
         }
 
+        /// <summary>
+        /// Lit base with the emission keyword already on. Builds only keep shader variants that a saved material uses,
+        /// so enabling _EMISSION at runtime on a plain lit material renders without glow on device.
+        /// </summary>
+        static Material EmissiveBase
+        {
+            get
+            {
+                if (emissiveBase != null) return emissiveBase;
+                emissiveBase = Resources.Load<Material>("ShadowUnit/SU_Emissive");
+                if (emissiveBase == null) emissiveBase = LitBase;
+                return emissiveBase;
+            }
+        }
+
         public static Material Lit(string key, Color color, Texture2D tex = null, Vector2? tiling = null, float smoothness = 0.12f, float metallic = 0f)
+        {
+            return MakeLit(LitBase, key, color, tex, tiling, smoothness, metallic);
+        }
+
+        static Material MakeLit(Material baseMat, string key, Color color, Texture2D tex, Vector2? tiling, float smoothness, float metallic)
         {
             Vector2 t = tiling ?? Vector2.one;
             string k = key + "|" + t.x.ToString("0.0") + "x" + t.y.ToString("0.0");
             Material m;
             if (Cache.TryGetValue(k, out m)) return m;
-            m = new Material(LitBase) { name = "SU_" + key };
+            m = new Material(baseMat) { name = "SU_" + key };
             m.color = color;
             if (tex != null)
             {
@@ -67,8 +96,9 @@ namespace ShadowUnit
 
         public static Material Emissive(string key, Color color, Color emission)
         {
-            Material m = Lit(key, color, null, null, 0.6f, 0f);
+            Material m = MakeLit(EmissiveBase, "E_" + key, color, null, null, 0.6f, 0f);
             m.EnableKeyword("_EMISSION");
+            m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
             if (m.HasProperty("_EmissionColor")) m.SetColor("_EmissionColor", emission);
             return m;
         }

@@ -28,6 +28,8 @@ namespace ShadowUnit
         public float TimeLeft { get; private set; }
         public float[] Score { get; } = new float[2];
         public Team Winner { get; private set; }
+        /// <summary>True when the time ran out with the scores level.</summary>
+        public bool IsDraw { get; private set; }
         public float PlayerRespawnAt { get; private set; } = -1f;
 
         public MapInfo Map { get; private set; }
@@ -106,7 +108,7 @@ namespace ShadowUnit
 
             if (Score[0] >= scoreToWin) End(Team.Blue);
             else if (Score[1] >= scoreToWin) End(Team.Red);
-            else if (TimeLeft <= 0f) End(Score[0] >= Score[1] ? Team.Blue : Team.Red);
+            else if (TimeLeft <= 0f) End(Score[0] >= Score[1] ? Team.Blue : Team.Red, Mathf.FloorToInt(Score[0]) == Mathf.FloorToInt(Score[1]));
         }
 
         public void ReportDeath(Soldier victim, DamageInfo info)
@@ -152,13 +154,14 @@ namespace ShadowUnit
             }
         }
 
-        void End(Team winner)
+        void End(Team winner, bool draw = false)
         {
             State = MatchState.Ended;
             Winner = winner;
+            IsDraw = draw;
             if (AudioManager.I != null)
             {
-                AudioManager.I.Play2D(winner == Team.Blue ? AudioLibrary.Victory : AudioLibrary.Defeat, 0.8f);
+                AudioManager.I.Play2D(winner == Team.Blue && !draw ? AudioLibrary.Victory : AudioLibrary.Defeat, 0.8f);
                 AudioManager.I.SetAmbience(false);
             }
             MatchEnded?.Invoke(winner);

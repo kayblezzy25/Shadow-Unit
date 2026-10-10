@@ -24,6 +24,10 @@ namespace ShadowUnit
         public static event Action<CapturePoint, Team> Captured;
         public static event Action<CapturePoint> Neutralized;
 
+        // drop handlers from a previous Editor play session (domain reload off)
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() { Captured = null; Neutralized = null; }
+
         Transform flag;
         Renderer flagRenderer;
         LineRenderer ring;

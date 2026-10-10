@@ -54,6 +54,15 @@ namespace ShadowUnit.EditorTools
 
             Shader litShader = urp ? Shader.Find("Universal Render Pipeline/Lit") : Shader.Find("Standard");
             CreateOrUpdateMaterial(Res + "/SU_Lit.mat", litShader);
+            // a saved material with emission on, so builds keep the emissive shader variant
+            Material emissive = CreateOrUpdateMaterial(Res + "/SU_Emissive.mat", litShader);
+            if (emissive != null)
+            {
+                emissive.EnableKeyword("_EMISSION");
+                emissive.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+                if (emissive.HasProperty("_EmissionColor")) emissive.SetColor("_EmissionColor", Color.white);
+                EditorUtility.SetDirty(emissive);
+            }
             CreateOrUpdateMaterial(Res + "/SU_Unlit.mat", Shader.Find("Sprites/Default"));
 
             Shader skyShader = Shader.Find("Skybox/Procedural");

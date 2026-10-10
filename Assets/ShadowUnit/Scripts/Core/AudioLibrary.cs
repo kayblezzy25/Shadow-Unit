@@ -17,6 +17,10 @@ namespace ShadowUnit
 
         static bool built;
 
+        // rebuild clips each play session, also when Editor domain reload is off
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() { built = false; }
+
         public static void Build()
         {
             if (built) return;

@@ -6,6 +6,8 @@ namespace ShadowUnit
     public class EffectsManager : MonoBehaviour
     {
         public static EffectsManager I { get; private set; }
+        /// <summary>Muzzle flashes light the scene; turned off on the Low preset because real-time lights are costly on phones.</summary>
+        public static bool FlashLights = true;
 
         class Flash { public Transform tr; public Light light; public float until; }
 
@@ -112,6 +114,7 @@ namespace ShadowUnit
             flashNext = (flashNext + 1) % flashes.Length;
             f.tr.position = pos;
             f.tr.localScale = Vector3.one * Random.Range(0.25f, 0.4f) * scale;
+            f.light.enabled = FlashLights;
             f.tr.gameObject.SetActive(true);
             f.until = Time.time + 0.045f;
         }

@@ -17,7 +17,12 @@ namespace ShadowUnit
         void Awake()
         {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            Screen.orientation = ScreenOrientation.LandscapeLeft;
+            // landscape either way round, never portrait
+            Screen.autorotateToPortrait = false;
+            Screen.autorotateToPortraitUpsideDown = false;
+            Screen.autorotateToLandscapeLeft = true;
+            Screen.autorotateToLandscapeRight = true;
+            Screen.orientation = ScreenOrientation.AutoRotation;
 
             if (primaryWeapon == null) primaryWeapon = Resources.Load<WeaponData>("ShadowUnit/Weapons/VK7_Carbine");
 

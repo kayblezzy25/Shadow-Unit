@@ -15,9 +15,13 @@ namespace ShadowUnit
 
         public static readonly List<SoldierAI> All = new List<SoldierAI>();
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() { All.Clear(); }
+
         // tuning (set from difficulty)
         float reactionTime = 0.55f, aimError = 1.7f, damage = 12f, visionRange = 55f;
         const float FovHalf = 62f, RunSpeed = 3.9f, CombatSpeed = 1.9f, MagSize = 30, FireInterval = 0.1f;
+        const float StandHeight = 1.8f, CrouchHeight = 1.45f;
 
         Soldier me;
         CharacterController cc;
@@ -47,6 +51,7 @@ namespace ShadowUnit
         Vector3 lastPos;
         float desiredYaw;
         bool crouched;
+        float crouchUntil;
 
         public Soldier Soldier => me;
 
@@ -114,6 +119,8 @@ namespace ShadowUnit
             objective = null;
             desiredYaw = yaw;
             lastPos = position;
+            crouchUntil = 0f;
+            SetBodyHeight(StandHeight);
             ApplyDifficulty();
         }
 
@@ -178,6 +185,8 @@ namespace ShadowUnit
 
             move += Separation();
             if (!cc.enabled) return;
+            // the hit capsule follows the stance, so crouched bots behind cover are not hittable in thin air
+            SetBodyHeight(crouched ? CrouchHeight : StandHeight);
             if (cc.isGrounded && verticalVelocity < 0f) verticalVelocity = -2f;
             verticalVelocity += -19f * dt;
             cc.Move((move + Vector3.up * verticalVelocity) * dt);
@@ -278,9 +287,11 @@ namespace ShadowUnit
         Vector3 DoEngage()
         {
             if (target == null || !target.Alive) { target = null; state = State.Objective; return Vector3.zero; }
-            Vector3 toT = target.transform.position - transform.position;
+            // only use the target's real position while it is visible; otherwise its last known one (no tracking through walls)
+            Vector3 targetPos = targetVisible ? target.transform.position : lastKnownPos;
+            Vector3 toT = targetPos - transform.position;
             float dist = toT.magnitude;
-            FaceTowards(target.transform.position);
+            FaceTowards(targetPos);
 
             if (ammo <= 0 && reloadDone < 0f)
             {
@@ -292,7 +303,8 @@ namespace ShadowUnit
 
             if (me.health.Fraction < 0.4f && Time.time > coverUntil + 4f) { EnterCover(); return Vector3.zero; }
 
-            crouched = dist > 25f && targetVisible && Random.value < 0.002f || crouched;
+            if (dist > 25f && targetVisible && Time.time > crouchUntil + 3f && Random.value < 0.004f) crouchUntil = Time.time + Random.Range(1.5f, 3f);
+            crouched = Time.time < crouchUntil;
             if (!targetVisible) return FollowTo(lastKnownPos, RunSpeed, false);
             if (dist > 32f) return FollowTo(target.transform.position, CombatSpeed * 1.4f, false);
 
@@ -329,7 +341,7 @@ namespace ShadowUnit
 
         Vector3 DoCover()
         {
-            if (target != null) FaceTowards(target.transform.position);
+            if (target != null) FaceTowards(lastKnownPos); // updated by Perceive only while the target is visible
             if (ammo <= 0 && reloadDone < 0f) reloadDone = Time.time + 2.3f;
             float d = Vector3.Distance(transform.position, wanderTarget);
             if (d < 0.8f)
@@ -437,6 +449,13 @@ namespace ShadowUnit
                 if (m > 0.01f && m < 1.3f) push += d / m * (1.3f - m) * 2.5f;
             }
             return push;
+        }
+
+        void SetBodyHeight(float h)
+        {
+            if (Mathf.Abs(cc.height - h) < 0.01f) return;
+            cc.height = h;
+            cc.center = new Vector3(0, h * 0.5f, 0);
         }
 
         void FaceTowards(Vector3 p)

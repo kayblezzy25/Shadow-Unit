@@ -10,6 +10,9 @@ namespace ShadowUnit
         static Font font;
         static Sprite circle, ring;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() { font = null; circle = ring = null; }
+
         public static readonly Color Panel = new Color(0.07f, 0.08f, 0.07f, 0.86f);
         public static readonly Color PanelLight = new Color(0.16f, 0.18f, 0.15f, 0.92f);
         public static readonly Color Accent = new Color(0.85f, 0.75f, 0.47f, 1f);

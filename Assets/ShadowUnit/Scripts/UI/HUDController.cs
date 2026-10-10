@@ -38,6 +38,12 @@ namespace ShadowUnit
         bool hitKill;
         CanvasGroup controlsGroup;
 
+        // last values shown, so text (and its garbage) is only rebuilt when something changes
+        int lastHp = -1, lastAmmo = -1, lastReserve = -1, lastTime = -1, lastBlue = -1, lastRed = -1, lastRespawn = -1;
+        bool lastReloading, lastDead;
+        int[] lastMarkerDist;
+        readonly Vector2[] crossOffsets = new Vector2[4];
+
         const float MapHalf = 72f, MapSize = 230f;
 
         public void Build(RectTransform canvasRoot)
@@ -267,7 +273,7 @@ namespace ShadowUnit
 
         public void Announce(string text) { announce.text = text.ToUpperInvariant(); announceUntil = Time.time + 3f; }
 
-        public void ClearFeed() { feedLines.Clear(); feedTimes.Clear(); }
+        public void ClearFeed() { feedLines.Clear(); feedTimes.Clear(); lastHp = lastAmmo = lastReserve = lastTime = lastBlue = lastRed = lastRespawn = -1; }
 
         // ---------- per-frame refresh ----------
 
@@ -283,16 +289,22 @@ namespace ShadowUnit
             float hf = h.Fraction;
             hpFill.rectTransform.sizeDelta = new Vector2(-8 - (1f - hf) * (420 - 8), -8);
             hpFill.color = hf < 0.3f ? new Color(0.9f, 0.3f, 0.25f) : new Color(0.85f, 0.88f, 0.82f);
-            hpText.text = Mathf.CeilToInt(h.Current).ToString();
+            int hpInt = Mathf.CeilToInt(h.Current);
+            if (hpInt != lastHp) { lastHp = hpInt; hpText.text = hpInt.ToString(); }
 
-            ammoText.text = w.Reloading ? "RELOADING" : $"{w.Ammo} <size=28><color=#9a9f88>/ {w.Reserve}</color></size>";
-            weaponText.text = w.data != null ? w.data.weaponName.ToUpperInvariant() : "";
-            reloadHint.text = !w.Reloading && w.Ammo <= Mathf.Max(3, w.data.magazineSize / 6) ? (w.Ammo == 0 && w.Reserve == 0 ? "NO AMMO" : "RELOAD") : "";
+            if (w.Ammo != lastAmmo || w.Reserve != lastReserve || w.Reloading != lastReloading)
+            {
+                lastAmmo = w.Ammo; lastReserve = w.Reserve; lastReloading = w.Reloading;
+                ammoText.text = w.Reloading ? "RELOADING" : $"{w.Ammo} <size=28><color=#9a9f88>/ {w.Reserve}</color></size>";
+                weaponText.text = w.data != null ? w.data.weaponName.ToUpperInvariant() : "";
+                reloadHint.text = !w.Reloading && w.Ammo <= Mathf.Max(3, w.data.magazineSize / 6) ? (w.Ammo == 0 && w.Reserve == 0 ? "NO AMMO" : "RELOAD") : "";
+            }
 
             int t = Mathf.Max(0, Mathf.CeilToInt(m.TimeLeft));
-            timerText.text = $"{t / 60}:{t % 60:00}";
-            blueText.text = Mathf.FloorToInt(m.Score[0]).ToString();
-            redText.text = Mathf.FloorToInt(m.Score[1]).ToString();
+            if (t != lastTime) { lastTime = t; timerText.text = $"{t / 60}:{t % 60:00}"; }
+            int blue = Mathf.FloorToInt(m.Score[0]), red = Mathf.FloorToInt(m.Score[1]);
+            if (blue != lastBlue) { lastBlue = blue; blueText.text = blue.ToString(); }
+            if (red != lastRed) { lastRed = red; redText.text = red.ToString(); }
             blueFill.rectTransform.sizeDelta = new Vector2(230 * Mathf.Clamp01(m.Score[0] / m.scoreToWin), 0);
             redFill.rectTransform.sizeDelta = new Vector2(230 * Mathf.Clamp01(m.Score[1] / m.scoreToWin), 0);
 
@@ -303,22 +315,30 @@ namespace ShadowUnit
                 chipFill[i].color = side;
                 chipFill[i].fillAmount = Mathf.Abs(cp.progress);
                 chipBg[i].color = cp.Contested ? Color.Lerp(new Color(0.15f, 0.15f, 0.15f, 0.9f), new Color(0.9f, 0.8f, 0.2f, 0.9f), 0.5f + 0.5f * Mathf.Sin(Time.time * 8f)) : new Color(0.15f, 0.15f, 0.15f, 0.9f);
-                UpdateMarker(markers[i], cp, cam);
+                UpdateMarker(i, cp, cam);
                 mapLetters[i].color = cp.owner < 0 ? Color.white : ((Team)cp.owner).UiColor();
             }
 
             bool dead = !p.Soldier.Alive;
-            respawn.text = dead && m.PlayerRespawnAt > 0 ? $"ELIMINATED\n<size=30>Redeploying in {Mathf.CeilToInt(Mathf.Max(0, m.PlayerRespawnAt - Time.time))}</size>" : "";
+            int respawnIn = dead && m.PlayerRespawnAt > 0 ? Mathf.CeilToInt(Mathf.Max(0, m.PlayerRespawnAt - Time.time)) : -1;
+            if (respawnIn != lastRespawn || dead != lastDead)
+            {
+                lastRespawn = respawnIn; lastDead = dead;
+                respawn.text = respawnIn >= 0 ? $"ELIMINATED\n<size=30>Redeploying in {respawnIn}</size>" : "";
+            }
 
             // crosshair grows with spread and hides while aiming down sights
             float fovHalf = cam.fieldOfView * 0.5f * Mathf.Deg2Rad;
             float px = Mathf.Tan(w.CurrentSpread * Mathf.Deg2Rad) / Mathf.Tan(fovHalf) * (root.rect.height * 0.5f);
             float gap = 8f + px;
             float crossAlpha = dead ? 0f : 1f - w.AimBlend;
-            Vector2[] offs = { new Vector2(-gap - 8, 0), new Vector2(gap + 8, 0), new Vector2(0, gap + 8), new Vector2(0, -gap - 8) };
+            crossOffsets[0] = new Vector2(-gap - 8, 0);
+            crossOffsets[1] = new Vector2(gap + 8, 0);
+            crossOffsets[2] = new Vector2(0, gap + 8);
+            crossOffsets[3] = new Vector2(0, -gap - 8);
             for (int i = 0; i < 4; i++)
             {
-                cross[i].rectTransform.anchoredPosition = offs[i];
+                cross[i].rectTransform.anchoredPosition = crossOffsets[i];
                 cross[i].color = new Color(1, 1, 1, 0.9f * crossAlpha);
                 hit[i].enabled = Time.time < hitUntil;
                 hit[i].color = hitKill ? new Color(1f, 0.3f, 0.25f) : Color.white;
@@ -347,8 +367,9 @@ namespace ShadowUnit
             UpdateMinimap(m, p);
         }
 
-        void UpdateMarker(Text marker, CapturePoint cp, Camera cam)
+        void UpdateMarker(int index, CapturePoint cp, Camera cam)
         {
+            Text marker = markers[index];
             Vector3 world = cp.transform.position + Vector3.up * 4f;
             Vector3 sp = cam.WorldToScreenPoint(world);
             float dist = Vector3.Distance(cam.transform.position, cp.transform.position);
@@ -363,7 +384,17 @@ namespace ShadowUnit
             Color c = cp.owner < 0 ? Color.white : ((Team)cp.owner).UiColor();
             if (cp.Contested) c = Color.Lerp(c, Color.yellow, 0.6f);
             marker.color = c;
-            marker.text = $"{cp.label}\n<size=18>{Mathf.RoundToInt(dist)}m</size>";
+            if (lastMarkerDist == null || lastMarkerDist.Length != markers.Count)
+            {
+                lastMarkerDist = new int[markers.Count];
+                for (int i = 0; i < lastMarkerDist.Length; i++) lastMarkerDist[i] = -1;
+            }
+            int rounded = Mathf.RoundToInt(dist);
+            if (rounded != lastMarkerDist[index])
+            {
+                lastMarkerDist[index] = rounded;
+                marker.text = $"{cp.label}\n<size=18>{rounded}m</size>";
+            }
             marker.enabled = dist > cp.radius;
         }
 

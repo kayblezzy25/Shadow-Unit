@@ -47,6 +47,7 @@ namespace ShadowUnit
             if (sun != null)
                 sun.shadows = q == QualityPreset.Low ? LightShadows.None : q == QualityPreset.Medium ? LightShadows.Hard : LightShadows.Soft;
             QualitySettings.shadowDistance = q == QualityPreset.High ? 70f : 40f;
+            EffectsManager.FlashLights = q != QualityPreset.Low;
             QualitySettings.antiAliasing = q == QualityPreset.High ? 2 : 0;
             QualitySettings.lodBias = q == QualityPreset.Low ? 0.6f : 1f;
             if (cam != null) cam.farClipPlane = q == QualityPreset.Low ? 110f : q == QualityPreset.Medium ? 170f : 260f;

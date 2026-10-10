@@ -9,6 +9,9 @@ namespace ShadowUnit
     {
         public static readonly List<Soldier> All = new List<Soldier>();
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() { All.Clear(); }
+
         public Team team;
         public string displayName = "Soldier";
         public bool isPlayer;
@@ -40,6 +43,6 @@ namespace ShadowUnit
         public Vector3 AimPoint => transform.position + Vector3.up * (Height * 0.62f);
 
         /// <summary>Hits above this height count as headshots.</summary>
-        public float HeadshotHeight => transform.position.y + Height - 0.32f;
+        public float HeadshotHeight => transform.position.y + Height - 0.22f; // neck and up, not the shoulders
     }
 }

@@ -32,7 +32,11 @@ namespace ShadowUnit
 
         static void EnsureEventSystem()
         {
+#if UNITY_2023_1_OR_NEWER
+            if (FindFirstObjectByType<EventSystem>() != null) return;
+#else
             if (FindObjectOfType<EventSystem>() != null) return;
+#endif
             var es = new GameObject("EventSystem");
             es.AddComponent<EventSystem>();
 #if ENABLE_LEGACY_INPUT_MANAGER
@@ -286,10 +290,10 @@ namespace ShadowUnit
             hud.SetVisible(false);
             hudPauseButton.SetActive(false);
             results.SetActive(true);
-            bool won = winner == Team.Blue;
-            resultTitle.text = won ? "VICTORY" : "DEFEAT";
-            resultTitle.color = won ? UIFactory.Accent : Team.Red.UiColor();
             MatchManager m = MatchManager.I;
+            bool won = !m.IsDraw && winner == Team.Blue;
+            resultTitle.text = m.IsDraw ? "DRAW" : won ? "VICTORY" : "DEFEAT";
+            resultTitle.color = m.IsDraw ? UIFactory.Ink : won ? UIFactory.Accent : Team.Red.UiColor();
             resultScore.text = $"<color=#{ColorUtility.ToHtmlStringRGB(Team.Blue.UiColor())}>BLUE {Mathf.FloorToInt(m.Score[0])}</color>    ·    <color=#{ColorUtility.ToHtmlStringRGB(Team.Red.UiColor())}>RED {Mathf.FloorToInt(m.Score[1])}</color>";
             var rows = m.Roster().OrderByDescending(s => s.kills).ThenBy(s => s.deaths).ToList();
             var sb = new System.Text.StringBuilder();
@@ -319,7 +323,7 @@ namespace ShadowUnit
             t.gameObject.AddComponent<LayoutElement>().preferredWidth = 440;
             UIFactory.Button(row, "RESET", () => { foreach (TouchControl c in hud.Controls) c.ResetLayout(); }, new Vector2(170, 64));
             UIFactory.Button(row, "SAVE", () => { foreach (TouchControl c in hud.Controls) c.SaveLayout(); PlayerPrefs.Save(); EndLayoutEdit(); }, new Vector2(170, 64), true);
-            UIFactory.Button(row, "CANCEL", () => { foreach (TouchControl c in hud.Controls) c.InitLayout(c.layoutKey); EndLayoutEdit(); }, new Vector2(170, 64));
+            UIFactory.Button(row, "CANCEL", () => { foreach (TouchControl c in hud.Controls) c.RevertLayout(); EndLayoutEdit(); }, new Vector2(170, 64));
         }
 
         void ShowLayoutEdit(bool fromMenu)
@@ -346,8 +350,18 @@ namespace ShadowUnit
 
         void Update()
         {
-            if (MatchManager.I != null && MatchManager.I.State == MatchState.Playing && hud.Input != null && hud.Input.ConsumePause())
-                ShowPause(true);
+            // always consume the key (Esc / Android back) so a press on another screen can't pause the next match
+            if (MatchManager.I == null || hud.Input == null || !hud.Input.ConsumePause()) return;
+            if (MatchManager.I.State == MatchState.Playing) ShowPause(true);
+            else if (MatchManager.I.State == MatchState.Paused && pause.activeSelf) ShowPause(false);
+        }
+
+        void OnApplicationPause(bool paused)
+        {
+            if (!paused || hud == null || hud.Input == null) return;
+            // touches held when the app goes to the background never get a release event
+            hud.Input.ResetState();
+            if (MatchManager.I != null && MatchManager.I.State == MatchState.Playing) ShowPause(true);
         }
     }
 }

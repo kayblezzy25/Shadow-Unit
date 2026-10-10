@@ -115,6 +115,12 @@ namespace ShadowUnit
 
             info.graph = new WaypointGraph();
             info.graph.Build(new Vector2(-info.halfSize + 1.5f, -info.halfSize + 1.5f), new Vector2(info.halfSize - 1.5f, info.halfSize - 1.5f), 1.5f);
+
+            // the map never moves after this point: batch it to cut draw calls (capture point flags move, so they stay out)
+            var statics = new List<GameObject>();
+            foreach (MeshRenderer r in root.GetComponentsInChildren<MeshRenderer>())
+                if (r.GetComponentInParent<CapturePoint>() == null) statics.Add(r.gameObject);
+            StaticBatchingUtility.Combine(statics.ToArray(), root.gameObject);
             return info;
         }
 
@@ -226,7 +232,7 @@ namespace ShadowUnit
         {
             var list = new List<Opening>();
             float doorCenter = length * 0.5f;
-            if (door) list.Add(new Opening { start = doorCenter - doorWidth / 2f, end = doorCenter + doorWidth / 2f, bottom = 0f, top = Mathf.Min(2.4f, doorWidth > 3f ? 3.6f : 2.4f) });
+            if (door) list.Add(new Opening { start = doorCenter - doorWidth / 2f, end = doorCenter + doorWidth / 2f, bottom = 0f, top = doorWidth > 3f ? 3.6f : 2.4f });
             if (windows)
             {
                 for (float x = 1.4f; x + 1.2f < length - 0.8f; x += 3.2f)

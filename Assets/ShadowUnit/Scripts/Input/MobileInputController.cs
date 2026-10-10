@@ -86,8 +86,12 @@ namespace ShadowUnit
                 d += new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * 9f;
             if (GameSettings.GyroAim && SystemInfo.supportsGyroscope && !DesktopMode)
             {
+                // gyro rates are in the device's portrait frame; map them to the current landscape screen axes
                 Vector3 r = Input.gyro.rotationRateUnbiased;
-                d += new Vector2(-r.y, r.x) * Mathf.Rad2Deg * Time.deltaTime / 0.11f * 0.5f;
+                Vector2 g = Screen.orientation == ScreenOrientation.LandscapeRight ? new Vector2(r.x, r.y)
+                          : Screen.orientation == ScreenOrientation.LandscapeLeft ? new Vector2(-r.x, -r.y)
+                          : new Vector2(-r.y, r.x);
+                d += g * Mathf.Rad2Deg * Time.deltaTime / 0.11f * 0.5f;
             }
 #endif
             LastLookDelta = d;

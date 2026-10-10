@@ -15,6 +15,9 @@ namespace ShadowUnit
 
         public static bool EditMode;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() { EditMode = false; }
+
         protected virtual void Awake() { rect = (RectTransform)transform; }
 
         public void InitLayout(string key)
@@ -22,8 +25,16 @@ namespace ShadowUnit
             layoutKey = key;
             if (rect == null) rect = (RectTransform)transform;
             defaultPosition = rect.anchoredPosition;
-            if (PlayerPrefs.HasKey("su_pos_" + key + "_x"))
-                rect.anchoredPosition = new Vector2(PlayerPrefs.GetFloat("su_pos_" + key + "_x"), PlayerPrefs.GetFloat("su_pos_" + key + "_y"));
+            RevertLayout();
+        }
+
+        /// <summary>Discards unsaved drags: back to the saved position, or the default if none was saved.</summary>
+        public void RevertLayout()
+        {
+            if (string.IsNullOrEmpty(layoutKey)) return;
+            rect.anchoredPosition = PlayerPrefs.HasKey("su_pos_" + layoutKey + "_x")
+                ? new Vector2(PlayerPrefs.GetFloat("su_pos_" + layoutKey + "_x"), PlayerPrefs.GetFloat("su_pos_" + layoutKey + "_y"))
+                : defaultPosition;
         }
 
         public void SaveLayout()
