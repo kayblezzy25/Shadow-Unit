@@ -9,6 +9,8 @@ namespace ShadowUnit
     public class CapturePoint : MonoBehaviour
     {
         public string label = "A";
+        [Tooltip("Map location shown in announcements, e.g. Market District.")]
+        public string placeName = "";
         public float radius = 7f;
         [Tooltip("Seconds for one soldier to take a neutral point.")]
         public float captureTime = 9f;
@@ -20,6 +22,9 @@ namespace ShadowUnit
 
         public bool Contested => blueInside > 0 && redInside > 0;
         public bool IsOwnedBy(Team t) => owner == (int)t;
+
+        /// <summary>"A", or "A · Market District" when the point has a place name.</summary>
+        public string FullName => string.IsNullOrEmpty(placeName) ? label : label + " · " + placeName;
 
         public static event Action<CapturePoint, Team> Captured;
         public static event Action<CapturePoint> Neutralized;
@@ -33,9 +38,10 @@ namespace ShadowUnit
         LineRenderer ring;
         Material flagMat;
 
-        public void Setup(string pointLabel)
+        public void Setup(string pointLabel, string place = "")
         {
             label = pointLabel;
+            placeName = place;
             Material pole = MaterialLibrary.Lit("pole", new Color(0.35f, 0.35f, 0.33f), null, null, 0.5f, 0.6f);
             GameObject p = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             p.name = "FlagPole";

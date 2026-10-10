@@ -56,10 +56,10 @@ namespace ShadowUnit
             spawns = new SpawnManager(map);
             CapturePoint.Captured += (p, t) =>
             {
-                Announcement?.Invoke($"{t.Label()} captured {p.label}");
+                Announcement?.Invoke($"{t.Label()} captured {p.FullName}");
                 if (AudioManager.I != null) AudioManager.I.Play2D(AudioLibrary.Capture, 0.6f, t == Team.Blue ? 1.15f : 0.85f);
             };
-            CapturePoint.Neutralized += p => Announcement?.Invoke($"{p.label} neutralised");
+            CapturePoint.Neutralized += p => Announcement?.Invoke($"{p.FullName} neutralised");
         }
 
         public void StartMatch()

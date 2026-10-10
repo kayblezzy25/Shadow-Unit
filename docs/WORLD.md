@@ -20,7 +20,7 @@ Roadmap Steps 1 and 3, built from the environment art and maps. This is a first 
 
 **Modes (all offline).**
 - **Campaign** *(launch mode)*: the five levels below.
-- **Battle Mode**: you and an AI squad against AI over capture points. The current prototype map (Kessel Crossing) will be rebuilt as the Wasteland Ward, with points at the Market District, the Hub and the Watchtower.
+- **Battle Mode**: you and an AI squad against AI over capture points in the Wasteland Ward: A Market District, B the Hub, C the Watchtower (grey box playable now; see below).
 - **Extraction Run** *(post-launch)*: scavenge the Shattered Coast for loot and get out; loot carried is lost on death.
 
 **Feel.** Sun-bleached, tense, vertical, scrappy, defiant.
@@ -56,6 +56,24 @@ Two map areas, matching the concept maps. Each place is a campaign level setting
 | **Cliff Road** | Switchback road up from the coast | Escort route; level 5 |
 
 **Map legend meanings.** *Main path*: the critical route through a level. *Side path*: flanking routes for players and bots. *Vehicle access*: extraction vehicles. *Elevator / lift*: vertical shortcuts between cliff levels. *Safe zone*: spawn areas where nobody can shoot (Battle Mode and Extraction Run).
+
+## Battle Mode map: the Wasteland Ward (grey box)
+
+The playable map in the prototype now follows the concept map, built from grey-box shapes so the fighting can be tested before any art goes in.
+
+![Top-down plan of the Battle Mode map](world/battle_map_plan.png)
+
+- **A · Market District (west):** a 7 m-wide street between rows of shops with stacked storeys on top, stalls with awnings, red lanterns and the Syndicate's shark-head sign. The point is on a small plaza in the middle of the street.
+- **Undercity Tunnel (south-west):** a concrete tunnel through a rock spur, lit by cold tube lights: the only way into the market from the south, and a flank route for Blue.
+- **B · The Hub (centre):** a 34 m crashed freighter. The bow is roofed with a bridge tower on top; the stern is torn open to the sky. The point is inside the hold, among containers, with breaches in both sides. Shacks and scaffolding surround it.
+- **The Outer Road:** a dirt road winding from base to base past the market and the Hub, with branches to the two bridges, lined with burnt vehicles and barriers.
+- **The river (east):** chest-high concrete banks that can't be jumped, crossed only at two bridges. It cuts the Watchtower off from the rest of the canyon.
+- **C · Watchtower (east bank):** a tower on four legs with a sandbagged cabin and radio mast, ringed with sandbags, with a bunker nearby.
+- **Edges:** canyon cliffs on every side; mesas outside them and the Orbital City's towers on the north-east horizon.
+
+**Balance:** the three points sit on the centre line, so each base is the same distance from B and C and within 2 m for A. Red walks into the market through its open north end, while Blue comes through the tunnel or the side alleys, so playtest point A for fairness.
+
+**Grey-box limits:** bot navigation walks ground level only, so the map has one walkable floor. Stacked storeys, the freighter roof, the scaffold and the tower cabin are scenery and cover, not places to stand yet. Walkable upper floors need the navigation graph extended to several heights (or Unity's NavMesh), which is worth doing once the layout is settled.
 
 ## Look and mood
 

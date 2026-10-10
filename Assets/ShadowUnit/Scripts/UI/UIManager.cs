@@ -122,7 +122,7 @@ namespace ShadowUnit
             Text title = Heading(col, "SHADOW UNIT", 92, UIFactory.Accent);
             title.GetComponent<LayoutElement>().preferredHeight = 100;
             Heading(col, "FRONTLINE", 46, UIFactory.Ink);
-            Text sub = UIFactory.Text(col, "Warfare: two squads fight over three capture points at Kessel Crossing. Hold more ground than the enemy, or score more eliminations, before time runs out.", 24, TextAnchor.UpperLeft, UIFactory.Muted);
+            Text sub = UIFactory.Text(col, "Battle Mode: two squads fight over the Market District, the Hub and the Watchtower in the Wasteland Ward. Hold more ground than the enemy, or score more eliminations, before time runs out.", 24, TextAnchor.UpperLeft, UIFactory.Muted);
             sub.gameObject.AddComponent<LayoutElement>().preferredHeight = 100;
 
             UIFactory.Button(col, "DEPLOY  ·  WARFARE VS AI", StartWarfare, new Vector2(560, 90), true, 32);

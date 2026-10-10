@@ -1,6 +1,6 @@
 # Shadow Unit: Frontline — Phase 1 Prototype
 
-An original mobile first-person tactical shooter built in Unity (C#). Phase 1 delivers a playable offline **Warfare** match: you and 3 AI teammates (Blue) against 4 AI enemies (Red), fighting over three capture points at the original map *Kessel Crossing*.
+An original mobile first-person tactical shooter built in Unity (C#). Phase 1 delivers a playable offline **Warfare** match: you and 3 AI teammates (Blue) against 4 AI enemies (Red), fighting over three capture points in *the Wasteland Ward*, a grey-box canyon map (see docs/WORLD.md).
 
 No Delta Force assets, names, maps, code or UI are used. Every model, texture and sound in this phase is generated in code as **placeholder** content, to be replaced in Phase 5 (production polish).
 
@@ -54,7 +54,7 @@ No tags, layers, prefabs or scene wiring are required. The map, soldiers, UI and
 
 ### Working in code (compile-checked; needs in-Unity confirmation)
 
-- **Battlefield:** a 140 × 140 m walled map with roads, enterable buildings with doors and windows, a warehouse, ruins, shipping containers, sandbags, concrete barriers, burnt vehicles, crates, barrels, rocks, two team bases, trees outside the walls, sun and shadows, trilight ambient, fog and a procedural sky.
+- **Battlefield:** *The Wasteland Ward*, a 140 × 140 m canyon walled by cliffs: the Market District (A) with stacked shops, stalls and the shark-head sign, an Undercity tunnel, the crashed freighter of the Hub (B), the Outer Road with burnt vehicles, a river crossed by two bridges, and the Watchtower (C). Mesas and the Orbital City skyline beyond the cliffs, low warm sun, dusty fog and a procedural sky.
 - **Navigation:** a waypoint grid (1.5 m) sampled from the physics scene at load, with A* pathfinding and automatically detected cover positions. It needs no NavMesh package.
 - **Player:**
   - CharacterController movement: walk, sprint, crouch (with ceiling check), jump and gravity.

@@ -109,7 +109,7 @@ Using the game facts above, write a one-page game pitch for Shadow Unit with:
    extract -> unlock gear).
 4. Three offline modes: Campaign (story levels), Extraction Run (solo
    loot-and-escape), Battle Mode (me + AI squad vs AI capturing points).
-   Battle Mode already exists as a prototype (Warfare at "Kessel Crossing").
+   Battle Mode already exists as a grey-box prototype in the Wasteland Ward.
    Mark Campaign as the launch mode and Extraction Run as post-launch.
 5. Five words that describe the feel of the game.
 ```
