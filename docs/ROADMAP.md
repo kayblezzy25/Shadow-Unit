@@ -64,8 +64,8 @@ GAME FACTS (never change these unless I say so):
   Android APK/AAB and Windows PC.
 - Look: realistic PBR materials, HDRI sky lighting, baked lightmaps,
   post-processing. Not cartoon, not flat.
-- Operators: [Operator 1 name - Assault], [Operator 2 name - Support],
-  [Operator 3 name - Recon].
+- Operators (OperatorData assets, see docs/OPERATORS.md): ZOX - Assault,
+  Scott - Support, Daed - Recon.
 - Existing code (namespace ShadowUnit, folder Assets/ShadowUnit/Scripts):
   GameBootstrap, GameSettings, Health, Soldier, Ballistics, AudioManager,
   EffectsManager, MaterialLibrary, MapBuilder, WaypointGraph, CapturePoint,
@@ -459,7 +459,7 @@ Done when: the season ships and you have a template to reuse for the next one.
 ## Progress checklist
 
 - [ ] Step 1: Game pitch done, setting chosen
-- [ ] Step 2: 3 operator assets done
+- [x] Step 2: 3 operator assets done *(ZOX, Scott, Daed: see docs/OPERATORS.md)*
 - [ ] Step 3: 5 levels sketched, 5 level assets done
 - [ ] Step 4: Prototype runs with no Console errors; TestRange scene added
 - [ ] Step 5: Movement, aiming and shooting feel good *(base built; slide and armour to add)*

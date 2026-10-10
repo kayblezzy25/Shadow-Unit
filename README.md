@@ -112,12 +112,14 @@ Assets/ShadowUnit/
     Player/    PlayerController
     Input/     MobileInputController, TouchControl, VirtualJoystick, TouchLookPad, TouchButton
     Weapons/   WeaponData (ScriptableObject), WeaponController, WeaponModels
+    Operators/ OperatorData (ScriptableObject): ZOX, Scott, Daed (see docs/OPERATORS.md)
     AI/        SoldierAI, SoldierBody
     Match/     MatchManager, SpawnManager
     UI/        UIManager, HUDController, UIFactory, SafeArea
   (created by the setup menu)
   Scenes/Frontline.unity
-  Resources/ShadowUnit/SU_Lit.mat, SU_Emissive.mat, SU_Unlit.mat, SU_Sky.mat, Weapons/VK7_Carbine.asset
+  Resources/ShadowUnit/SU_Lit.mat, SU_Emissive.mat, SU_Unlit.mat, SU_Sky.mat, Weapons/VK7_Carbine.asset,
+                       Operators/ZOX.asset, Scott.asset, Daed.asset
 ```
 
 How the pieces relate:

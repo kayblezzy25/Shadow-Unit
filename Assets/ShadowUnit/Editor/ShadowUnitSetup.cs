@@ -83,8 +83,68 @@ namespace ShadowUnit.EditorTools
                 var w = ScriptableObject.CreateInstance<WeaponData>();
                 AssetDatabase.CreateAsset(w, weaponPath);
             }
+            CreateOperators();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        /// <summary>Creates the three launch operators if missing. Existing assets are left alone so your tuning is kept.</summary>
+        static void CreateOperators()
+        {
+            EnsureFolder(Res + "/Operators");
+
+            Operator("ZOX", OperatorClass.Assault, new Color(0.78f, 0.2f, 0.18f),
+                "Grew up running salvage through flooded border towns. Joined Shadow Unit after her crew was wiped out by the people she now hunts. Fights up close, fast, and never in a straight line.",
+                100f, 25f, 1.12f, 3.5f, 1f, "Hornet-9 SMG",
+                "Red Rush", "For 5 s: +30% move speed, 40% faster reload and 20% less damage taken. She can fire while sprinting.", 30f, 5f,
+                "Second Wind", "Health starts regenerating after 3.5 s without damage instead of 5 s.",
+                "Wins close fights and retakes capture points fastest.",
+                "Light armour (25): loses long-range duels and can't soak damage.");
+
+            Operator("Scott", OperatorClass.Support, new Color(0.55f, 0.62f, 0.32f),
+                "Former signals sergeant and the squad's voice in every earpiece. Keeps everyone stocked and alive. Talks calm, shoots steady.",
+                100f, 75f, 0.92f, 5f, 1.1f, "VK-7 Carbine",
+                "Resupply Crate", "Drops a crate for 8 s: allies within 5 m get one magazine per second and heal 8 HP per second.", 45f, 8f,
+                "Comms Link", "Enemies spotted by any teammate stay on the minimap 2 s longer, and allies within 15 m reload 10% faster.",
+                "Keeps the squad fighting longer; heaviest armour (75).",
+                "Slowest mover and easiest to spot; longest ability cooldown.");
+
+            Operator("Daed", OperatorClass.Recon, new Color(0.3f, 0.75f, 0.85f),
+                "Nobody in the unit has seen his face in daylight. A night-raid specialist who reads the battlefield through four green tubes, he goes in first and quietly. When he speaks, it's a position.",
+                90f, 50f, 1f, 5f, 0.75f, "Longreach DMR",
+                "Night Sweep", "Pulses his quad-tube night vision: enemies within 40 m show on the minimap and through walls for 4 s.", 35f, 4f,
+                "Quiet Feet", "Footsteps are silent while crouched, and enemies spot him from 25% shorter range.",
+                "Finds enemies first and wins long-range fights.",
+                "Lowest health (90) and weak up close.");
+        }
+
+        static void Operator(string codeName, OperatorClass cls, Color accent, string backstory,
+            float health, float armour, float speed, float regenDelay, float spotRange, string weapon,
+            string ability, string abilityDesc, float cooldown, float duration,
+            string passive, string passiveDesc, string strength, string weakness)
+        {
+            string path = Res + "/Operators/" + codeName + ".asset";
+            if (AssetDatabase.LoadAssetAtPath<OperatorData>(path) != null) return;
+            var o = ScriptableObject.CreateInstance<OperatorData>();
+            o.codeName = codeName;
+            o.operatorClass = cls;
+            o.accent = accent;
+            o.backstory = backstory;
+            o.maxHealth = health;
+            o.maxArmour = armour;
+            o.moveSpeedMultiplier = speed;
+            o.regenDelay = regenDelay;
+            o.spotRangeMultiplier = spotRange;
+            o.startingWeapon = weapon;
+            o.abilityName = ability;
+            o.abilityDescription = abilityDesc;
+            o.abilityCooldown = cooldown;
+            o.abilityDuration = duration;
+            o.passiveName = passive;
+            o.passiveDescription = passiveDesc;
+            o.strength = strength;
+            o.weakness = weakness;
+            AssetDatabase.CreateAsset(o, path);
         }
 
         [MenuItem("Shadow Unit/Set Input Handling To Both (restarts needed)", priority = 20)]
