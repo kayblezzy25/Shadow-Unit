@@ -27,7 +27,7 @@ Shadow Unit is an original, offline tactical shooter inspired by the style of mo
 
 | Phase | Weeks | Steps | Gate to pass before moving on | Status |
 |---|---|---|---|---|
-| 1 · Design | 1 | 1–3: game pitch, operators, level plan | Plan on paper | To do |
+| 1 · Design | 1 | 1–3: game pitch, operators, level plan | Plan on paper | Done |
 | 2 · Core gameplay | 2–4 | 4–6: project setup, movement and shooting, enemy AI | **Fun with grey boxes** | Mostly built |
 | 3 · Systems | 5–6 | 7–8: weapons, attachments, abilities, offline saving | Saves work offline | 3 guns built |
 | 4 · Visuals and feel | 7–10 | 9–11: realistic art and lighting, effects and sound, destruction | Looks like a real place | Placeholder art |
@@ -66,6 +66,11 @@ GAME FACTS (never change these unless I say so):
   post-processing. Not cartoon, not flat.
 - Operators (OperatorData assets, see docs/OPERATORS.md): ZOX - Assault,
   Scott - Support, Daed - Recon.
+- World (docs/WORLD.md): post-apocalyptic Kharos Canyon, 2068. The Wasteland
+  Ward (Market District, The Hub, Undercity Tunnels, Outer Road, Watchtower)
+  and the Shattered Coast (Ship Graveyard, Main Bridge, Docks, Waterfall Cave,
+  Cliff Road). Enemies: the Maw Syndicate, then the Spire Directorate.
+  Campaign levels are LevelData assets.
 - Existing code (namespace ShadowUnit, folder Assets/ShadowUnit/Scripts):
   GameBootstrap, GameSettings, Health, Soldier, Ballistics, AudioManager,
   EffectsManager, MaterialLibrary, MapBuilder, WaypointGraph, CapturePoint,
@@ -459,9 +464,9 @@ Done when: the season ships and you have a template to reuse for the next one.
 
 ## Progress checklist
 
-- [ ] Step 1: Game pitch done, setting chosen
+- [x] Step 1: Game pitch done, setting chosen *(Kharos Canyon: see docs/WORLD.md)*
 - [x] Step 2: 3 operator assets done *(ZOX, Scott, Daed: see docs/OPERATORS.md)*
-- [ ] Step 3: 5 levels sketched, 5 level assets done
+- [x] Step 3: 5 levels sketched, 5 level assets done *(see docs/WORLD.md)*
 - [ ] Step 4: Prototype runs with no Console errors; TestRange scene added
 - [ ] Step 5: Movement, aiming and shooting feel good *(base built; slide and armour to add)*
 - [ ] Step 6: Enemy AI patrols, attacks, searches and flanks *(engage/cover/search built; patrol, flanking, boss to add)*

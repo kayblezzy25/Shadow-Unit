@@ -85,6 +85,7 @@ namespace ShadowUnit.EditorTools
             }
             CreateWeapons();
             CreateOperators();
+            CreateLevels();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -129,6 +130,73 @@ namespace ShadowUnit.EditorTools
             var w = ScriptableObject.CreateInstance<WeaponData>();
             setup(w);
             AssetDatabase.CreateAsset(w, path);
+        }
+
+        /// <summary>Creates the five campaign level assets if missing (generated from docs/WORLD.md). Existing assets keep your edits.</summary>
+        static void CreateLevels()
+        {
+            EnsureFolder(Res + "/Levels");
+            Level(1, "Lantern Row", "Market District", 1, 6f,
+                "The Ward's water stalls doubled their prices overnight. An informant in the Market District says the Maw Syndicate keeps a ledger of who is buying the stolen river water, and who is selling it.",
+                new[] { Obj(ObjectiveType.Reach, "Meet the informant at the noodle stall halfway up Lantern Row."), Obj(ObjectiveType.StealIntel, "Steal the Syndicate ledger from the counting house under the shark sign.") },
+                "Outer Road gate (east side)", 12, "Syndicate enforcers (rifles), lookouts on balconies (SMGs).",
+                "", "",
+                "A firefight cuts the ropes on the giant shark-head sign and it crashes into the street, opening a new path and crushing a Syndicate barricade.",
+                "####################\n#..E....#O#....E...#\n#.##.##.#.#.##.##..#\n#.......#.#........#\n#.#..E..###...E.#..#\n#.#.............#..#\n#...##.##..##.##...X\n#..................#\n#.##..E.##..##.E.#.#\n#.#.......O......#.#\n#.##.##.....##.##..#\n#.....E.......E....#\n#.##.##.##..##.##.##\n#...........E......#\n#.#.#.#.#..#.#.#.#.#\n#..................#\n#.##.##..##..##.##.#\n#.........S........#\n#.........S........#\n####################");
+            Level(2, "Below the Ward", "Undercity Tunnels", 2, 7f,
+                "The ledger points underground: the Syndicate has tapped the old waterworks beneath the Ward and is pumping the river out through the Undercity Tunnels. A settler engineer who found the pumps has gone missing down there.",
+                new[] { Obj(ObjectiveType.Destroy, "Wreck the three pump valves feeding the Syndicate's pipeline."), Obj(ObjectiveType.Rescue, "Find and free the captured settler engineer.") },
+                "Maintenance lift to the surface (south-east)", 14, "Syndicate enforcers, shotgunners in tight corridors, a sniper over the flooded cistern.",
+                "", "",
+                "Blowing the last valve bursts the main pipe: the cistern floods, the lights fail and the squad fights out by torchlight.",
+                "####################\n#S.....#....E....O.#\n#S.###.#.#####.###.#\n#..#...#.....#...#.#\n#..#.E.###.#.#.E.#.#\n#..#.......#.#...#.#\n#.####.###.#.###.#.#\n#......#~~~~~~~#...#\n#.E.##.#~~~~~~~#.E.#\n#...#..#~~O~~~~#...#\n#.###..#~~~~~~~#.###\n#......####.####...#\n#.####......E....#.#\n#....#.####.####.#.#\n#.E..#.#O......#.#.#\n#.##.#.#.####..#...#\n#.#..E.#....#.E###.#\n#.#.####.##.#.....O#\n#..........E#.....X#\n####################");
+            Level(3, "The Wreck", "The Hub", 3, 8f,
+                "With the pumps down, the Syndicate pulls back to its fortress: the Hub, a settlement built inside a crashed sky-freighter. The engineer's notes show the pipeline carries on past the Hub, towards the Orbital City.",
+                new[] { Obj(ObjectiveType.Destroy, "Cut the Hub's power at the generator yard."), Obj(ObjectiveType.Reach, "Breach the freighter hull and reach the bridge deck."), Obj(ObjectiveType.Destroy, "Defeat Mother Maw.") },
+                "Armoured truck on the Outer Road", 16, "Syndicate enforcers, shotgunners, heavy gunners on the hull, Mother Maw's guards.",
+                "Mother Maw", "Syndicate leader in scrap plate armour with a belt-fed gun. Armour phases at 66% and 33% health; at each phase she calls 2 guards and drops a smoke screen. Weak spot: the fuel canister on her back.",
+                "Cutting the power drops the freighter's tail section: the hull slides a few metres down the cliff mid-fight and the floor tilts.",
+                "####################\n#.....##########...#\n#....#....B.....#..#\n#...#..E.....E...#.#\n#..#.###.##.###...##\n#..#....O.....E...##\n#...#.##.###.##..#.#\n#....#..E......##..#\n#.....##########...#\n#..........#.......#\n#..##..E...#...##..#\n#..##......#.E.##..#\n#......##.....##...#\n#.E....##..O..##.E.#\n#..##.........##...#\n#..##..##..##......#\n#......##..##..E...#\n#.S..............X.#\n#.S................#\n####################");
+            Level(4, "Ship Graveyard", "The Shattered Coast", 4, 8f,
+                "The pipeline ends at the Shattered Coast, where Spire Directorate troops load water tankers bound for the Orbital City. The settlers want their people off the coast before the Directorate seals it.",
+                new[] { Obj(ObjectiveType.Reach, "Secure the foot of the Main Bridge."), Obj(ObjectiveType.Defend, "Hold the docks for 90 seconds while the settlers' boats leave."), Obj(ObjectiveType.Destroy, "Bring down the Directorate radio mast on the beached tanker.") },
+                "Cliff Road switchback (east)", 18, "Directorate riflemen with armour, marksmen on wrecks, a landing squad mid-level.",
+                "", "",
+                "Directorate charges blow a span out of the Main Bridge while the squad is crossing; they finish the crossing over the wrecks instead.",
+                "####################\n#~~~~##~~~~~~##~~~~#\n#~~~####~~~~####~~~#\n#~~~~##~~~O~~##~~~~#\n#~~~~~~~~~~~~~~~~~~#\n#~~##~~~~~~~~~~##~~#\n#=================.#\n#~~~~E~~~~~E~~~~~~.#\n#~~~~~~~~~~~~~~~~~.#\n#....##....##......#\n#.E..##.O..##..E...#\n#......E.......##..#\n#.##..####..##.##..#\n#.##..#..#..##.....#\n#.....#O.#...E..##.#\n#..E..####.......X.#\n#.##.......##..##..#\n#.S...##...##......#\n#.S................#\n####################");
+            Level(5, "The Last Watch", "Cliff Road and the Watchtower", 5, 10f,
+                "The Directorate's commander is up at the old Watchtower, the only relay that can reach every settlement in the canyon. Send the ledger and the pipeline records from there and the whole Ward learns who has been stealing its river.",
+                new[] { Obj(ObjectiveType.Escort, "Get the settler engineer up the Cliff Road to the Watchtower."), Obj(ObjectiveType.StealIntel, "Transmit the ledger from the Watchtower relay."), Obj(ObjectiveType.Destroy, "Defeat Warden Voss.") },
+                "The pool below the Waterfall Cave", 20, "Directorate riflemen, marksmen, armoured heavies, a recon drone.",
+                "Warden Voss", "Spire Directorate commander in powered armour with a shield drone. Armour phases at 66% and 33%: first the drone shields him, then he calls a landing squad, then he charges. Shoot the drone down to open the shield.",
+                "As the transmission finishes, the Watchtower's legs give way; the squad jumps from the collapsing tower into the river and swims for the Waterfall Cave.",
+                "####################\n#....#####B#####...#\n#....#...O.....#...#\n#....#..E...E..#...#\n#....###.....###...#\n#......#.....#.....#\n#.##...........E.###\n#....E....##.......#\n###..........##....#\n#....##..E.......E.#\n#.........###......#\n#.E..###.......##..#\n#......#...E.......#\n#.##...........##..#\n#....##..##........#\n#~~~.............E.#\n#~X~...##....##....#\n#~~~..........S....#\n#~~~..........S....#\n####################");
+        }
+
+        static LevelObjective Obj(ObjectiveType type, string description) => new LevelObjective { type = type, description = description };
+
+        static void Level(int number, string levelName, string location, int difficulty, float minutes, string story,
+            LevelObjective[] objectives, string extraction, int enemyCount, string enemyTypes, string boss, string bossNotes,
+            string wow, string ascii)
+        {
+            string path = Res + "/Levels/Level" + number.ToString("00") + ".asset";
+            if (AssetDatabase.LoadAssetAtPath<LevelData>(path) != null) return;
+            var l = ScriptableObject.CreateInstance<LevelData>();
+            l.number = number;
+            l.levelName = levelName;
+            l.location = location;
+            l.difficulty = difficulty;
+            l.estimatedMinutes = minutes;
+            l.storyReason = story;
+            l.objectives = objectives;
+            l.extractionPoint = extraction;
+            l.enemyCount = enemyCount;
+            l.enemyTypes = enemyTypes;
+            l.boss = boss;
+            l.bossNotes = bossNotes;
+            l.wowMoment = wow;
+            l.asciiLayout = ascii;
+            AssetDatabase.CreateAsset(l, path);
         }
 
         /// <summary>Creates the three launch operators if missing. Existing assets are left alone so your tuning is kept.</summary>
