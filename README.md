@@ -27,11 +27,11 @@ No Delta Force assets, names, maps, code or UI are used. Every model, texture an
    Touch controls work with any setting; *Both* also enables keyboard and mouse testing in the Editor.
 5. **Shadow Unit → Create Prototype Scene**. This creates:
    - `Assets/ShadowUnit/Scenes/Frontline.unity` (one GameObject with `GameBootstrap`), added to Build Settings
-   - `Assets/ShadowUnit/Resources/ShadowUnit/SU_Lit.mat`, `SU_Unlit.mat`, `SU_Sky.mat` (base materials matched to your render pipeline so shaders are included in builds)
+   - `Assets/ShadowUnit/Resources/ShadowUnit/SU_Lit.mat`, `SU_Emissive.mat`, `SU_Unlit.mat`, `SU_Sky.mat` (base materials matched to your render pipeline so shaders, including the emissive variant, are included in builds)
    - `Assets/ShadowUnit/Resources/ShadowUnit/Weapons/VK7_Carbine.asset` (the rifle's stats)
 6. Press **Play**.
 
-If you later switch render pipeline (Built-in ↔ URP), run **Shadow Unit → Create Base Assets** again.
+If you later switch render pipeline (Built-in ↔ URP), or you set the project up before `SU_Emissive.mat` existed, run **Shadow Unit → Create Base Assets** again.
 
 No tags, layers, prefabs or scene wiring are required. The map, soldiers, UI and effects are all built at runtime by `GameBootstrap`.
 
@@ -46,7 +46,7 @@ No tags, layers, prefabs or scene wiring are required. The map, soldiers, UI and
 | FIRE (big, right) and FIRE (small, left) | Hold to shoot. Dragging while holding also aims the camera. |
 | AIM | Toggle aim-down-sights |
 | RELOAD, JUMP, CROUCH, SPRINT | As labelled. Crouch and sprint toggle. |
-| II (top left) | Pause |
+| II (top left), or the Android back button | Pause. Back again resumes. |
 
 **Editor / desktop testing** (needs Active Input Handling = Both): click the right half of the Game view to capture the mouse. Then WASD move, mouse look, left click fire, right click aim, R reload, Space jump, C crouch, Shift sprint, Esc pause and release the mouse.
 
@@ -117,7 +117,7 @@ Assets/ShadowUnit/
     UI/        UIManager, HUDController, UIFactory, SafeArea
   (created by the setup menu)
   Scenes/Frontline.unity
-  Resources/ShadowUnit/SU_Lit.mat, SU_Unlit.mat, SU_Sky.mat, Weapons/VK7_Carbine.asset
+  Resources/ShadowUnit/SU_Lit.mat, SU_Emissive.mat, SU_Unlit.mat, SU_Sky.mat, Weapons/VK7_Carbine.asset
 ```
 
 How the pieces relate:
@@ -150,7 +150,8 @@ How the pieces relate:
 - Bots do not vault, climb or use doors tactically beyond pathing through them. Cover choice is local (within 13 m).
 - Graphics presets cannot change URP's pipeline asset (render scale, URP shadow settings). Under URP, adjust shadows on the URP asset itself. On the Built-in pipeline the presets apply fully.
 - With *Active Input Handling = Input System Package (New)* only, touch works but keyboard and mouse testing is disabled. Use *Both*.
-- Gyro aiming uses the legacy Input API, so it needs *Both* or the old input manager.
+- Gyro aiming uses the legacy Input API, so it needs *Both* or the old input manager. Its axes are mapped for both landscape orientations; confirm the directions on a real phone.
+- The map is static-batched at load to cut draw calls. If a mesh-readability error appears in a build, remove the `StaticBatchingUtility.Combine` call at the end of `MapBuilder.Build`.
 - Results-screen columns use a proportional font, so alignment is approximate.
 
 ## 8. Build and install on Android
