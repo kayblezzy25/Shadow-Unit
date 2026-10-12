@@ -39,7 +39,11 @@ namespace ShadowUnit
 #endif
             var es = new GameObject("EventSystem");
             es.AddComponent<EventSystem>();
-#if ENABLE_LEGACY_INPUT_MANAGER
+#if SU_INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
+            // Input System UI module: touch, mouse and gamepad (stick/d-pad to move between buttons, A/Cross to press)
+            var module = es.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
+            module.AssignDefaultActions();
+#elif ENABLE_LEGACY_INPUT_MANAGER
             es.AddComponent<StandaloneInputModule>();
 #else
             // Input System package only: add its UI module by name so this compiles without a hard reference.
@@ -142,6 +146,7 @@ namespace ShadowUnit
             hud.SetVisible(true);
             hud.SetOnlyControls(false);
             hud.ClearFeed();
+            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null); // A/Cross is jump in play, not "press button"
             hudPauseButton.SetActive(true);
             hud.Input.ShowControls(true);
             MatchManager.I.StartMatch();
@@ -176,11 +181,11 @@ namespace ShadowUnit
         void BuildSettings()
         {
             settings = MakeScreen("Settings");
-            RectTransform card = Card(settings, new Vector2(1100, 900));
+            RectTransform card = Card(settings, new Vector2(1100, 990));
             Heading(card, "SETTINGS", 44, UIFactory.Accent);
             settingsList = UIFactory.Rect("Rows", card);
-            UIFactory.VStack(settingsList, 8);
-            settingsList.gameObject.AddComponent<LayoutElement>().preferredHeight = 680;
+            UIFactory.VStack(settingsList, 6);
+            settingsList.gameObject.AddComponent<LayoutElement>().preferredHeight = 700;
             RectTransform buttons = UIFactory.Rect("Buttons", card);
             UIFactory.HStack(buttons, 16, TextAnchor.MiddleCenter);
             buttons.gameObject.AddComponent<LayoutElement>().preferredHeight = 76;
@@ -208,7 +213,9 @@ namespace ShadowUnit
             Row("Aim (ADS) sensitivity", () => GameSettings.AimSensitivity.ToString("0.0"), d => GameSettings.AimSensitivity += d * 0.1f);
             Toggle("Invert look", () => GameSettings.InvertY, v => GameSettings.InvertY = v);
             Toggle("Gyroscope aiming", () => GameSettings.GyroAim, v => GameSettings.GyroAim = v);
-            Toggle("Vibration", () => GameSettings.Vibration, v => GameSettings.Vibration = v);
+            Toggle("Vibration (phone and controller)", () => GameSettings.Vibration, v => GameSettings.Vibration = v);
+            Row("Controller look speed", () => GameSettings.PadLookSpeed.ToString("0.0"), d => GameSettings.PadLookSpeed += d * 0.1f);
+            Toggle("Controller aim assist", () => GameSettings.AimAssist, v => GameSettings.AimAssist = v);
             Row("Graphics", () => GameSettings.Quality.ToString(), d => GameSettings.Quality = (QualityPreset)(((int)GameSettings.Quality + d + 3) % 3));
             Toggle("60 FPS mode", () => GameSettings.Fps60, v => GameSettings.Fps60 = v);
             Row("Master volume", () => Mathf.RoundToInt(GameSettings.Volume * 100) + "%", d => GameSettings.Volume += d * 0.1f);
@@ -220,24 +227,24 @@ namespace ShadowUnit
         {
             RectTransform r = UIFactory.Rect("Row", settingsList);
             UIFactory.HStack(r, 12);
-            r.gameObject.AddComponent<LayoutElement>().preferredHeight = 60;
+            r.gameObject.AddComponent<LayoutElement>().preferredHeight = 52;
             Text l = UIFactory.Text(r, label, 26, TextAnchor.MiddleLeft, UIFactory.Ink);
             l.gameObject.AddComponent<LayoutElement>().preferredWidth = 520;
             Text v = UIFactory.Text(r, value(), 26, TextAnchor.MiddleCenter, UIFactory.Accent, FontStyle.Bold);
             v.gameObject.AddComponent<LayoutElement>().preferredWidth = 200;
-            UIFactory.Button(r, "-", () => { change(-1); v.text = value(); }, new Vector2(90, 56));
-            UIFactory.Button(r, "+", () => { change(1); v.text = value(); }, new Vector2(90, 56));
+            UIFactory.Button(r, "-", () => { change(-1); v.text = value(); }, new Vector2(90, 48));
+            UIFactory.Button(r, "+", () => { change(1); v.text = value(); }, new Vector2(90, 48));
         }
 
         void Toggle(string label, Func<bool> get, Action<bool> set)
         {
             RectTransform r = UIFactory.Rect("Row", settingsList);
             UIFactory.HStack(r, 12);
-            r.gameObject.AddComponent<LayoutElement>().preferredHeight = 60;
+            r.gameObject.AddComponent<LayoutElement>().preferredHeight = 52;
             Text l = UIFactory.Text(r, label, 26, TextAnchor.MiddleLeft, UIFactory.Ink);
             l.gameObject.AddComponent<LayoutElement>().preferredWidth = 520;
             Button b = null;
-            b = UIFactory.Button(r, get() ? "ON" : "OFF", () => { set(!get()); b.SetLabel(get() ? "ON" : "OFF"); }, new Vector2(392, 56));
+            b = UIFactory.Button(r, get() ? "ON" : "OFF", () => { set(!get()); b.SetLabel(get() ? "ON" : "OFF"); }, new Vector2(392, 48));
         }
 
         // ---------- pause ----------
@@ -260,7 +267,11 @@ namespace ShadowUnit
             m.Pause(show);
             HideAll();
             if (show) { pause.SetActive(true); hud.Input.ShowControls(false); }
-            else hud.Input.ShowControls(true);
+            else
+            {
+                hud.Input.ShowControls(true);
+                if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
+            }
         }
 
         // ---------- results ----------
@@ -332,6 +343,7 @@ namespace ShadowUnit
             HideAll();
             hud.SetVisible(true);
             hud.SetOnlyControls(true);
+            hud.Input.UseTouchControls();
             hud.Input.ShowControls(true);
             hudPauseButton.SetActive(false);
             TouchControl.EditMode = true;
@@ -350,10 +362,39 @@ namespace ShadowUnit
 
         void Update()
         {
-            // always consume the key (Esc / Android back) so a press on another screen can't pause the next match
+            if (MobileInputController.GamepadConnected) KeepGamepadSelection();
+
+            // always consume the key (Esc / Android back / Start) so a press on another screen can't pause the next match
             if (MatchManager.I == null || hud.Input == null || !hud.Input.ConsumePause()) return;
             if (MatchManager.I.State == MatchState.Playing) ShowPause(true);
             else if (MatchManager.I.State == MatchState.Paused && pause.activeSelf) ShowPause(false);
+        }
+
+        /// <summary>
+        /// Gamepads navigate menus through the selected button, so whenever a menu screen is open and nothing on it is
+        /// selected (screen just opened, or a controller was just connected), select its first button.
+        /// </summary>
+        void KeepGamepadSelection()
+        {
+            EventSystem es = EventSystem.current;
+            if (es == null) return;
+            GameObject current = es.currentSelectedGameObject;
+            GameObject screen = ActiveScreen();
+            if (screen == null) return;
+            if (current != null && current.activeInHierarchy && current.transform.IsChildOf(screen.transform)) return;
+            foreach (Button b in screen.GetComponentsInChildren<Button>())
+            {
+                if (!b.interactable) continue;
+                es.SetSelectedGameObject(b.gameObject);
+                return;
+            }
+        }
+
+        GameObject ActiveScreen()
+        {
+            foreach (GameObject g in new[] { layoutEdit, settings, pause, results, menu })
+                if (g != null && g.activeInHierarchy) return g;
+            return null;
         }
 
         void OnApplicationPause(bool paused)

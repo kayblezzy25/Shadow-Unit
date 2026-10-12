@@ -248,7 +248,7 @@ namespace ShadowUnit
         {
             hitUntil = Time.time + (killed ? 0.35f : 0.15f);
             hitKill = killed || headshot;
-            if (killed) GameSettings.Vibrate();
+            if (killed) { GameSettings.Vibrate(); if (Input != null) Input.Rumble(0.2f, 0.6f, 0.12f); }
         }
 
         public void OnDamaged(DamageInfo info)
@@ -258,6 +258,7 @@ namespace ShadowUnit
             dmgUntil[dmgNext] = Time.time + 1.4f;
             dmgNext = (dmgNext + 1) % dmg.Length;
             if (AudioManager.I != null) AudioManager.I.Play2D(AudioLibrary.Hurt, 0.45f, Random.Range(0.9f, 1.1f));
+            if (Input != null) Input.Rumble(0.6f, 0.3f, 0.18f);
         }
 
         public void OnKill(Soldier killer, Soldier victim, bool headshot)

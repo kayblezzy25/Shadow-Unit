@@ -22,8 +22,8 @@ No Delta Force assets, names, maps, code or UI are used. Every model, texture an
 1. Create a new Unity project from the 3D (Built-in) or 3D (URP) template.
 2. Copy the `Assets/ShadowUnit` folder from this package into your project's `Assets` folder.
 3. Wait for Unity to compile. A **Shadow Unit** menu appears in the top menu bar.
-4. **Shadow Unit → Set Input Handling To Both**, then restart Unity.
-   (Manual route: *Edit → Project Settings → Player → Other Settings → Active Input Handling = Both*.)
+4. **Shadow Unit → Set Up Input: Touch, Keyboard and Gamepad**, wait for the Input System package to finish installing, then restart Unity.
+   (Manual route: install *Input System* in *Window → Package Manager*, then set *Edit → Project Settings → Player → Other Settings → Active Input Handling = Both*.)
    Touch controls work with any setting; *Both* also enables keyboard and mouse testing in the Editor.
 5. **Shadow Unit → Create Prototype Scene**. This creates:
    - `Assets/ShadowUnit/Scenes/Frontline.unity` (one GameObject with `GameBootstrap`), added to Build Settings
@@ -47,6 +47,23 @@ No tags, layers, prefabs or scene wiring are required. The map, soldiers, UI and
 | AIM | Toggle aim-down-sights |
 | RELOAD, JUMP, CROUCH, SPRINT | As labelled. Crouch and sprint toggle. |
 | II (top left), or the Android back button | Pause. Back again resumes. |
+
+**Gamepad** (Xbox, PlayStation, Switch Pro and most Android Bluetooth controllers; needs the Input System package from step 4)
+
+| Button (Xbox / PlayStation) | Action |
+|---|---|
+| Left stick | Move |
+| L3 (press left stick) | Sprint (toggle) |
+| Right stick | Look |
+| RT / R2 | Fire |
+| LT / L2 | Aim down sights (hold) |
+| A / Cross | Jump |
+| B / Circle | Crouch (toggle) |
+| X / Square | Reload |
+| Start / Options | Pause; again to resume |
+| Stick or d-pad, then A / Cross | Move between and press menu buttons |
+
+Touch controls hide while the gamepad is in use and come back when you touch the screen. The controller vibrates when you fire, get hit or get a kill (turn it off with *Vibration*). *Controller look speed* and *Controller aim assist* (the aim slows down while the crosshair is over an enemy) are in Settings. Y / Triangle, LB and RB are free for weapon swap, abilities and grenades in Phase 3.
 
 **Editor / desktop testing** (needs Active Input Handling = Both): click the right half of the Game view to capture the mouse. Then WASD move, mouse look, left click fire, right click aim, R reload, Space jump, C crouch, Shift sprint, Esc pause and release the mouse.
 

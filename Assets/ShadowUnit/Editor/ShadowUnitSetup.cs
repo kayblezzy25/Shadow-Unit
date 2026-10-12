@@ -41,7 +41,7 @@ namespace ShadowUnit.EditorTools
 
             EditorUtility.DisplayDialog("Shadow Unit",
                 "Prototype scene created at " + ScenePath + " and added to Build Settings.\n\n" +
-                "Press Play to test. In the Editor, click the right half of the Game view to use mouse and keyboard (needs Active Input Handling set to 'Both').",
+                "Press Play to test. In the Editor, click the right half of the Game view to use mouse and keyboard (needs Shadow Unit > Set Up Input first).",
                 "OK");
         }
 
@@ -258,9 +258,11 @@ namespace ShadowUnit.EditorTools
             AssetDatabase.CreateAsset(o, path);
         }
 
-        [MenuItem("Shadow Unit/Set Input Handling To Both (restarts needed)", priority = 20)]
+        [MenuItem("Shadow Unit/Set Up Input: Touch, Keyboard and Gamepad (restart needed)", priority = 20)]
         public static void SetInputHandlingBoth()
         {
+            // Input System package powers gamepad support. Active Input Handling is set to Both *before* it installs,
+            // so the package's own prompt does not switch the project to new-input-only (which would disable keyboard testing).
             Object[] settings = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/ProjectSettings.asset");
             if (settings == null || settings.Length == 0) { ShowManualInputHelp(); return; }
             var so = new SerializedObject(settings[0]);
@@ -269,7 +271,11 @@ namespace ShadowUnit.EditorTools
             p.intValue = 2; // 0 = Input Manager (old), 1 = Input System, 2 = Both
             so.ApplyModifiedProperties();
             AssetDatabase.SaveAssets();
-            EditorUtility.DisplayDialog("Shadow Unit", "Active Input Handling set to 'Both'. Restart Unity for it to take effect.", "OK");
+            UnityEditor.PackageManager.Client.Add("com.unity.inputsystem");
+            EditorUtility.DisplayDialog("Shadow Unit",
+                "Active Input Handling set to 'Both', and the Input System package (for gamepads) is installing.\n\n" +
+                "Wait for the progress bar to finish, then restart Unity. If Unity asks to enable the new input backends, choose Yes, then check " +
+                "Edit > Project Settings > Player > Active Input Handling still says 'Both'.", "OK");
         }
 
         static void ShowManualInputHelp()

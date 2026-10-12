@@ -56,6 +56,8 @@ GAME FACTS (never change these unless I say so):
 - Controls: PC = WASD move + mouse look + left click fire + right click aim.
   Mobile = floating left joystick to move, drag on the right half to look,
   on-screen FIRE / AIM / RELOAD / JUMP / CROUCH / SPRINT buttons.
+  Gamepad (Input System package) = left stick move, right stick look, RT fire,
+  LT aim, A jump, B crouch, X reload, L3 sprint, Start pause; Y, LB, RB free.
   All gameplay reads input from MobileInputController.
 - Must run 100% OFFLINE: no network calls, no online services, no analytics or
   ads packages. Saves go to a JSON file in Application.persistentDataPath

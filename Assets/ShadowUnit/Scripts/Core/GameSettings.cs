@@ -20,6 +20,10 @@ namespace ShadowUnit
         public static bool Fps60 { get => B("su_fps60", false); set => SetB("su_fps60", value); }
         public static float Volume { get => F("su_volume", 0.8f); set => PlayerPrefs.SetFloat("su_volume", Mathf.Clamp01(value)); }
         public static float HudOpacity { get => F("su_hudop", 0.75f); set => PlayerPrefs.SetFloat("su_hudop", Mathf.Clamp(value, 0.2f, 1f)); }
+        /// <summary>Gamepad right-stick speed multiplier.</summary>
+        public static float PadLookSpeed { get => F("su_padlook", 1f); set => PlayerPrefs.SetFloat("su_padlook", Mathf.Clamp(value, 0.3f, 2.5f)); }
+        /// <summary>Gamepad only: slows the aim over enemies.</summary>
+        public static bool AimAssist { get => B("su_aimassist", true); set => SetB("su_aimassist", value); }
         public static float HudScale { get => F("su_hudscale", 1f); set => PlayerPrefs.SetFloat("su_hudscale", Mathf.Clamp(value, 0.7f, 1.4f)); }
 
         public static QualityPreset Quality

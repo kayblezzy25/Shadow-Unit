@@ -106,6 +106,16 @@ namespace ShadowUnit
             float sens = (Weapon.IsAiming ? GameSettings.AimSensitivity : GameSettings.LookSensitivity) * pixelToDegrees;
             yaw += look.x * sens;
             pitch -= look.y * sens * (GameSettings.InvertY ? -1f : 1f);
+
+            // gamepad look arrives in degrees (invert already applied); slower while aiming and over an enemy
+            Vector2 pad = input.PadLookDegrees;
+            if (pad != Vector2.zero)
+            {
+                if (Weapon.IsAiming) pad *= GameSettings.AimSensitivity / Mathf.Max(0.1f, GameSettings.LookSensitivity) * 0.85f;
+                if (GameSettings.AimAssist && EnemyUnderCrosshair()) pad *= AimAssistSlowdown;
+                yaw += pad.x;
+                pitch -= pad.y;
+            }
             pitch = Mathf.Clamp(pitch, -82f, 82f);
 
             float rec = Weapon.data != null ? Weapon.data.recoilRecovery : 7f;
@@ -172,6 +182,29 @@ namespace ShadowUnit
                     AudioManager.I.Play2D(AudioLibrary.Footstep, IsCrouched ? 0.12f : 0.3f, Random.Range(0.85f, 1.15f));
                 }
             }
+        }
+
+        const float AimAssistSlowdown = 0.5f, AimAssistRange = 70f, AimAssistRadius = 0.6f;
+        readonly RaycastHit[] assistHits = new RaycastHit[16];
+
+        /// <summary>
+        /// Gamepad aim assist: true when a living enemy is close to the crosshair (a 0.6 m-wide cast) with nothing
+        /// solid in front of it. It only slows the stick down; it never moves the aim by itself.
+        /// </summary>
+        bool EnemyUnderCrosshair()
+        {
+            Transform c = Cam.transform;
+            int n = Physics.SphereCastNonAlloc(c.position, AimAssistRadius, c.forward, assistHits, AimAssistRange, ~0, QueryTriggerInteraction.Ignore);
+            float nearestWall = float.MaxValue, nearestEnemy = float.MaxValue;
+            for (int i = 0; i < n; i++)
+            {
+                RaycastHit h = assistHits[i];
+                if (h.collider.transform.IsChildOf(transform)) continue;
+                Soldier s = h.collider.GetComponentInParent<Soldier>();
+                if (s != null) { if (s.team != Soldier.team && s.Alive) nearestEnemy = Mathf.Min(nearestEnemy, h.distance); }
+                else nearestWall = Mathf.Min(nearestWall, h.distance);
+            }
+            return nearestEnemy < nearestWall;
         }
 
         void ApplyRotation()

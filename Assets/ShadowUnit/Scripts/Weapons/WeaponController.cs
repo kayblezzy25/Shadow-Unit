@@ -151,6 +151,7 @@ namespace ShadowUnit
             float volume = data.suppressed ? 0.28f : 0.55f, pitch = data.suppressed ? 1.35f : 1f;
             AudioManager.I.Play2D(data.fireSound != null ? data.fireSound : AudioLibrary.RifleShot, volume, pitch * UnityEngine.Random.Range(0.95f, 1.05f));
             SoldierAI.ReportGunfire(owner, owner.transform.position, data.HearingDistance);
+            if (MobileInputController.I != null) MobileInputController.I.Rumble(data.suppressed ? 0.05f : 0.12f, 0.25f, 0.06f);
         }
 
         public static Vector3 SpreadDirection(Vector3 forward, float spreadDegrees)
