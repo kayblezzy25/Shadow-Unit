@@ -11,13 +11,16 @@ namespace ShadowUnit.EditorTools
     {
         const string Root = "Assets/ShadowUnit";
         const string Res = "Assets/ShadowUnit/Resources/ShadowUnit";
-        const string ScenePath = "Assets/ShadowUnit/Scenes/Frontline.unity";
+        internal const string ScenePath = "Assets/ShadowUnit/Scenes/Frontline.unity";
 
         [MenuItem("Shadow Unit/Create Prototype Scene", priority = 0)]
-        public static void CreatePrototypeScene()
+        public static void CreatePrototypeScene() { BuildPrototypeScene(true); }
+
+        /// <summary>Creates the assets and the Frontline scene and opens it. Returns false if the user cancelled saving their open scene.</summary>
+        internal static bool BuildPrototypeScene(bool showDialog)
         {
             CreateBaseAssets();
-            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return false;
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var go = new GameObject("ShadowUnit");
@@ -39,10 +42,11 @@ namespace ShadowUnit.EditorTools
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
             PlayerSettings.productName = "Shadow Unit Frontline";
 
-            EditorUtility.DisplayDialog("Shadow Unit",
+            if (showDialog) EditorUtility.DisplayDialog("Shadow Unit",
                 "Prototype scene created at " + ScenePath + " and added to Build Settings.\n\n" +
                 "Press Play to test. In the Editor, click the right half of the Game view to use mouse and keyboard (needs Shadow Unit > Set Up Input first).",
                 "OK");
+            return true;
         }
 
         [MenuItem("Shadow Unit/Create Base Assets", priority = 1)]
@@ -259,7 +263,18 @@ namespace ShadowUnit.EditorTools
         }
 
         [MenuItem("Shadow Unit/Set Up Input: Touch, Keyboard and Gamepad (restart needed)", priority = 20)]
-        public static void SetInputHandlingBoth()
+        public static void SetInputHandlingBoth() { ApplyInputSetup(true); }
+
+        /// <summary>Active Input Handling = Both (value 2 in ProjectSettings).</summary>
+        internal static bool InputHandlingIsBoth()
+        {
+            Object[] settings = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/ProjectSettings.asset");
+            if (settings == null || settings.Length == 0) return false;
+            SerializedProperty p = new SerializedObject(settings[0]).FindProperty("activeInputHandler");
+            return p != null && p.intValue == 2;
+        }
+
+        internal static void ApplyInputSetup(bool showDialog)
         {
             // Input System package powers gamepad support. Active Input Handling is set to Both *before* it installs,
             // so the package's own prompt does not switch the project to new-input-only (which would disable keyboard testing).
@@ -272,7 +287,7 @@ namespace ShadowUnit.EditorTools
             so.ApplyModifiedProperties();
             AssetDatabase.SaveAssets();
             UnityEditor.PackageManager.Client.Add("com.unity.inputsystem");
-            EditorUtility.DisplayDialog("Shadow Unit",
+            if (showDialog) EditorUtility.DisplayDialog("Shadow Unit",
                 "Active Input Handling set to 'Both', and the Input System package (for gamepads) is installing.\n\n" +
                 "Wait for the progress bar to finish, then restart Unity. If Unity asks to enable the new input backends, choose Yes, then check " +
                 "Edit > Project Settings > Player > Active Input Handling still says 'Both'.", "OK");

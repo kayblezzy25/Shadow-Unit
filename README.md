@@ -17,19 +17,19 @@ No Delta Force assets, names, maps, code or UI are used. Every model, texture an
 | Modules | Android Build Support (with OpenJDK, Android SDK & NDK). iOS Build Support optional. |
 | Packages | None beyond the defaults (uGUI ships with Unity). |
 
-## 2. Setup (about 5 minutes)
+## 2. Setup (about 5 minutes once Unity is installed)
 
-1. Create a new Unity project from the 3D (Built-in) or 3D (URP) template.
-2. Copy the `Assets/ShadowUnit` folder from this package into your project's `Assets` folder.
-3. Wait for Unity to compile. A **Shadow Unit** menu appears in the top menu bar.
-4. **Shadow Unit → Set Up Input: Touch, Keyboard and Gamepad**, wait for the Input System package to finish installing, then restart Unity.
-   (Manual route: install *Input System* in *Window → Package Manager*, then set *Edit → Project Settings → Player → Other Settings → Active Input Handling = Both*.)
-   Touch controls work with any setting; *Both* also enables keyboard and mouse testing in the Editor.
-5. **Shadow Unit → Create Prototype Scene**. This creates:
-   - `Assets/ShadowUnit/Scenes/Frontline.unity` (one GameObject with `GameBootstrap`), added to Build Settings
-   - `Assets/ShadowUnit/Resources/ShadowUnit/SU_Lit.mat`, `SU_Emissive.mat`, `SU_Unlit.mat`, `SU_Sky.mat` (base materials matched to your render pipeline so shaders, including the emissive variant, are included in builds)
-   - `Assets/ShadowUnit/Resources/ShadowUnit/Weapons/VK7_Carbine.asset` (the rifle's stats)
-6. Press **Play**.
+1. Install **Unity Hub** (unity.com/download), sign in with a free Personal licence, and install the latest **Unity 6 LTS** editor with **Android Build Support** (tick OpenJDK and Android SDK & NDK).
+2. In Unity Hub: **Projects → New project → Universal 3D** (or 3D Built-in) → **Create**.
+3. Copy the `Assets/ShadowUnit` folder from this repository into the new project's `Assets` folder.
+4. Switch back to Unity and wait for it to compile. **First-time setup then runs by itself**:
+   - creates the `Frontline` scene, its materials and the weapon, operator and level assets, and opens the scene;
+   - sets *Active Input Handling* to **Both** and installs the **Input System** package (gamepads).
+   A window tells you when it is done. If it says the Input System is installing, wait for the progress bar in the bottom-right corner, then close and reopen Unity. If Unity asks to enable the new input backends, choose **Yes**.
+5. Press **▶ Play**, then **Deploy**.
+
+Every step is also on the **Shadow Unit** menu if you need to redo one: *Create Prototype Scene*, *Create Base Assets*, *Set Up Input: Touch, Keyboard and Gamepad*, and *Run First-Time Setup Again*.
+(Manual input route: install *Input System* in *Window → Package Manager*, then set *Edit → Project Settings → Player → Other Settings → Active Input Handling = Both*.)
 
 If you later switch render pipeline (Built-in ↔ URP), or you set the project up before `SU_Emissive.mat` existed, run **Shadow Unit → Create Base Assets** again.
 
